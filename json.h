@@ -427,16 +427,46 @@ public:
         *this = Object::Parser().fromString(data);
     }
 
-    const std::string dumps()
+    std::string dumps() const
     {
         return "";
     }
 
+    bool operator==(const Object& rhs) const
+    {
+        if (type_ != rhs.type_)
+        {
+            return false;
+        }
+
+        switch (type_) {
+            case Type::Boolean: return boolean_ == rhs.boolean_;
+            case Type::Integer: return integer_ == rhs.integer_;
+            case Type::Double: return double_ == rhs.double_;
+            case Type::String: return string_ == rhs.string_;
+            case Type::Array: return vector_ == rhs.vector_;
+            case Type::Object: return map_ == rhs.map_;
+            case Type::Null: return true;
+            default: return false;
+        }
+    }
+
+    bool operator!=(const Object& rhs) const
+    {
+        return !(*this == rhs);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Object& object)
+    {
+        os << object.dumps();
+        return os;
+    }
+
 private:
     Type type_;
-    std::int64_t integer_;
-    double double_;
-    bool boolean_;
+    std::int64_t integer_{};
+    double double_{};
+    bool boolean_{};
     std::string string_;
     std::vector<Object> vector_;
     std::map<std::string, Object> map_;

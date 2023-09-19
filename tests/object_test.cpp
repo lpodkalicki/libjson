@@ -87,4 +87,13 @@ TEST(ObjectTest, checkComplexObjectAssignmentWorksCorrectly)
     EXPECT_FALSE(obj.isNull());
     EXPECT_EQ(obj.type(), json::Type::Object);
     EXPECT_EQ(obj["key1"].type(), json::Type::Integer);
+    EXPECT_EQ(obj["key1"].toInteger(), 1);
+    EXPECT_EQ(obj["key2"].type(), json::Type::Double);
+    EXPECT_EQ(obj["key2"].toDouble(), 2.0);
+    EXPECT_EQ(obj["key3"].type(), json::Type::Array);
+    EXPECT_EQ(obj["key3"], json::Object({1, 2, 3, 4, 5, "abc"}));
+    EXPECT_EQ(obj["key4"].type(), json::Type::Object);
+    EXPECT_EQ(obj["key4"], json::Object({{"key5"_, "jest ok!"}, {"key6"_, 3}, {"key7"_, {{"key9"_, {4, 7, 9}}}}}));
+    EXPECT_EQ(obj["key10"].type(), json::Type::Boolean);
+    EXPECT_EQ(obj["key10"].toBoolean(), false);
 }
