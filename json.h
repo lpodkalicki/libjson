@@ -35,18 +35,26 @@ public:
 class Key
 {
 public:
-    std::string key;
-    Key(const char *str, std::size_t len) :
-        key(std::string(str, len))
+    Key(const std::string& str) :
+        str_(str)
     {}
-};
+
+    Key(const char *str, std::size_t len) :
+        Key(std::string(str, len))
+    {}
+
+    const std::string& str() const
+    {
+        return str_;
+    }
+private:
+    std::string str_;
+}; /* End of class Key */
 
 Key operator "" _(const char *str, std::size_t len)
 {
     return Key(str, len);
 }
-
-//using json::operator "" _key;
 
 class Object
 {
@@ -68,7 +76,7 @@ public:
         std::string input_;
         size_t index_;
 
-        char peek() const
+        [[nodiscard]] char peek() const
         {
             return (index_ < input_.size()) ? input_[index_] : '\0';
         }
@@ -176,7 +184,7 @@ public:
                 if (c == '"') { break; }
                 value += c;
             }
-            return Object(value);
+            return value;
         }
 
         Object parseNumber()
@@ -192,10 +200,10 @@ public:
 
             if (is_float)
             {
-                return Object(std::stod(value));
+                return std::stod(value);
             }
 
-            return Object(std::stol(value));
+            return std::stol(value);
         }
 
         Object parseBoolean()
@@ -205,7 +213,7 @@ public:
                 if (input_.substr(index_, 4) == "true")
                 {
                     index_ += 4;
-                    return Object(true);
+                    return true;
                 }
                 throw Error("Invalid JSON");
             }
@@ -214,7 +222,7 @@ public:
                 if (input_.substr(index_, 5) == "false")
                 {
                     index_ += 5;
-                    return Object(false);
+                    return false;
                 }
                 throw Error("Invalid JSON");
             }
@@ -226,13 +234,13 @@ public:
             if (input_.substr(index_, 4) == "null")
             {
                 index_ += 4;
-                return Object(Type::Null);
+                return nullptr;
             }
             throw Error("Invalid JSON");
         }
     }; /* End of subclass Parser */
 
-    Object(Type type = Type::Null) :
+    explicit Object(Type type = Type::Null) :
         type_(type)
     {}
 
@@ -243,7 +251,7 @@ public:
     {
         for (const auto& [key, value]: attributes)
         {
-            map_[key.key] = value;
+            map_[key.str()] = value;
         }
     }
 
@@ -277,12 +285,12 @@ public:
         type_(Type::Null )
     {}
 
-    bool isNull() const
+    [[nodiscard]] bool isNull() const
     {
         return type_ == Type::Null;
     }
 
-    bool isEmpty() const
+    [[nodiscard]] bool isEmpty() const
     {
         if (isNull()) { return true; }
         if (type_ == Type::Object) { return map_.size() == 0; }
@@ -290,7 +298,7 @@ public:
         return false;
     }
 
-    std::size_t size() const
+    [[nodiscard]] std::size_t size() const
     {
         if (type_ == Type::Object)
         {
@@ -303,30 +311,30 @@ public:
         throw Error("Invalid type");
     }
 
-    Type type() const
+    [[nodiscard]] Type type() const
     {
         return type_;
     }
 
-    bool toBoolean() const
+    [[nodiscard]] bool toBoolean() const
     {
         if (type_ != Type::Boolean) { throw Error("Invalid type"); }
         return boolean_;
     }
 
-    std::int64_t toInteger() const
+    [[nodiscard]] std::int64_t toInteger() const
     {
         if (type_ != Type::Integer) { throw Error("Invalid type"); }
         return integer_;
     }
 
-    double toDouble() const
+    [[nodiscard]] double toDouble() const
     {
         if (type_ != Type::Double) { throw Error("Invalid type"); }
         return double_;
     }
 
-    std::string toString() const
+    [[nodiscard]] std::string toString() const
     {
         if (type_ != Type::String) { throw Error("Invalid type"); }
         return string_;
@@ -394,7 +402,7 @@ public:
         return vector_[index];
     }
 
-    void append(const Object value)
+    void append(const Object& value)
     {
         if (type_ != Type::Array)
         {
@@ -409,7 +417,7 @@ public:
         return map_.find(key) != map_.end();
     }
 
-    void loads(const std::string data)
+    void loads(const std::string& data)
     {
         if (data.empty())
         {
@@ -450,5 +458,7 @@ inline static Object parse(const std::string& data)
 }
 
 } /* End of namespace json */
+
+using json::operator "" _;
 
 #endif /* !_JSON_H_ */

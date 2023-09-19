@@ -7,7 +7,6 @@
 #include "json.h"
 
 using namespace testing;
-using json::operator "" _;
 
 TEST(ObjectTest, checkObjectAssignmentConvertsTypesCorrectly)
 {
