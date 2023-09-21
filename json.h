@@ -6,6 +6,7 @@
 #define _JSON_H_
 
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <string>
 #include <list>
@@ -197,12 +198,10 @@ public:
                 if (c == '.' || std::tolower(peek()) == 'e') { is_float = true; }
                 value += c;
             }
-
             if (is_float)
             {
                 return std::stod(value);
             }
-
             return std::stol(value);
         }
 
@@ -316,25 +315,25 @@ public:
         return type_;
     }
 
-    [[nodiscard]] bool toBoolean() const
+    bool toBoolean() const
     {
         if (type_ != Type::Boolean) { throw Error("Invalid type"); }
         return boolean_;
     }
 
-    [[nodiscard]] std::int64_t toInteger() const
+    std::int64_t toInteger() const
     {
         if (type_ != Type::Integer) { throw Error("Invalid type"); }
         return integer_;
     }
 
-    [[nodiscard]] double toDouble() const
+    double toDouble() const
     {
         if (type_ != Type::Double) { throw Error("Invalid type"); }
         return double_;
     }
 
-    [[nodiscard]] std::string toString() const
+    std::string toString() const
     {
         if (type_ != Type::String) { throw Error("Invalid type"); }
         return string_;
@@ -346,6 +345,93 @@ public:
         string_.clear();
         vector_.clear();
         map_.clear();
+    }
+
+    void append(const Object& value)
+    {
+        if (type_ != Type::Array)
+        {
+            setType(Type::Array);
+        }
+        vector_.push_back(value);
+    }
+
+    bool contains(const std::string& key) const
+    {
+        if (type_ != Type::Object) { throw Error("Invalid Type"); }
+        return map_.find(key) != map_.end();
+    }
+
+    void loads(const std::string& data)
+    {
+        if (data.empty())
+        {
+            clear();
+            return;
+        }
+        *this = Object::Parser().fromString(data);
+    }
+
+    std::string dumps(bool pretty = true, std::string ident = "") const
+    {
+        if (type_ == Type::Null)
+        {
+            return "null";
+        }
+        if (type_ == Type::Boolean) { return boolean_ ? "true" : "false"; }
+        if (type_ == Type::Integer) { return std::to_string(integer_); }
+        if (type_ == Type::Double)
+        {
+            std::ostringstream oss;
+            oss << std::setprecision(8) << std::noshowpoint << double_;
+            return oss.str();
+        }
+        if (type_ == Type::String) { return std::string("\"") + string_ + std::string("\""); }
+        if (type_ == Type::Array)
+        {
+            std::ostringstream oss;
+            oss << "[";
+            bool first_element = true;
+            for (auto& object: vector_)
+            {
+                if (first_element) { first_element = false; }
+                else
+                {
+                    oss << ",";
+                    if (pretty) { oss << " "; }
+                }
+                oss << object.dumps(pretty, ident);
+            }
+            oss << "]";
+            return oss.str();
+        }
+        if (type_ == Type::Object)
+        {
+            std::ostringstream oss;
+            //if (pretty) { oss << ident; }
+            oss << "{";
+            if (pretty) { oss << "\n"; }
+            auto new_ident = ident + "  ";
+            bool first_element = true;
+            for (auto& [key, object]: map_)
+            {
+                if (first_element) { first_element = false; }
+                else
+                {
+                    oss << ",";
+                    if (pretty) { oss << "\n"; }
+                }
+                if (pretty) { oss << new_ident; }
+                oss << "\"" << key << "\":";
+                if (pretty) { oss << " "; }
+                oss << object.dumps(pretty, new_ident);
+            }
+            if (pretty) { oss << "\n" << ident; }
+            oss <<  "}";
+            //if (pretty) { oss << "\n"; }
+            return oss.str();
+        }
+        throw Error("Invalid Type");
     }
 
     template <typename T>
@@ -400,36 +486,6 @@ public:
             vector_.resize(index + 1);
         }
         return vector_[index];
-    }
-
-    void append(const Object& value)
-    {
-        if (type_ != Type::Array)
-        {
-            setType(Type::Array);
-        }
-        vector_.push_back(value);
-    }
-
-    bool contains(const std::string& key) const
-    {
-        if (type_ != Type::Object) { throw Error("invalid type"); }
-        return map_.find(key) != map_.end();
-    }
-
-    void loads(const std::string& data)
-    {
-        if (data.empty())
-        {
-            clear();
-            return;
-        }
-        *this = Object::Parser().fromString(data);
-    }
-
-    std::string dumps() const
-    {
-        return "";
     }
 
     bool operator==(const Object& rhs) const
