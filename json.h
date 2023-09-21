@@ -5,7 +5,7 @@
 #ifndef _JSON_H_
 #define _JSON_H_
 
-#include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <cstdint>
 #include <string>
@@ -242,8 +242,6 @@ public:
     explicit Object(Type type = Type::Null) :
         type_(type)
     {}
-
-    Object(const Object& object)  = default;
 
     Object(std::initializer_list<std::pair<Key, Object>> attributes) :
             type_(Type::Object)
