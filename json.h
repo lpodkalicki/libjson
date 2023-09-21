@@ -16,7 +16,8 @@
 
 namespace json {
 
-enum class Type {
+enum class Type : std::uint16_t
+{
     Null,
     Object,
     Array,
@@ -406,7 +407,6 @@ public:
         if (type_ == Type::Object)
         {
             std::ostringstream oss;
-            //if (pretty) { oss << ident; }
             oss << "{";
             if (pretty) { oss << "\n"; }
             auto new_ident = ident + "  ";
@@ -426,7 +426,6 @@ public:
             }
             if (pretty) { oss << "\n" << ident; }
             oss <<  "}";
-            //if (pretty) { oss << "\n"; }
             return oss.str();
         }
         throw Error("Invalid Type");
