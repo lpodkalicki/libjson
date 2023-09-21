@@ -68,6 +68,18 @@ TEST(ObjectTest, checkArrayAssignmentWorksCorrectly)
     EXPECT_EQ(obj["abc"][3].toDouble(), 3.14);
 }
 
+TEST(ObjectTest, checkComparisonOfBasicTypesWorksCorrectly)
+{
+    EXPECT_TRUE(json::Object(true) == true);
+    EXPECT_TRUE(json::parse("true  \r") == true);
+    EXPECT_TRUE(json::Object(123) == 123);
+    EXPECT_TRUE(json::parse("\n\n\n\n\t123") == 123);
+    EXPECT_TRUE(json::Object(10.12) == 10.12);
+    EXPECT_TRUE(json::parse("\r10.12") == 10.12);
+    EXPECT_TRUE(json::Object("hello") == "hello");
+    EXPECT_TRUE(json::parse("\"hello\"") == "hello");
+}
+
 TEST(ObjectTest, checkComplexObjectAssignmentWorksCorrectly)
 {
     json::Object obj{
