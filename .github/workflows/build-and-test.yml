@@ -1,5 +1,6 @@
 # This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
+
 name: Build and Test
 on:
   push:
@@ -20,7 +21,10 @@ jobs:
 
     steps:
     - name: Install gtest
-      run: sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake CMakeLists.txt && sudo make && sudo cp *.a /usr/lib && sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a && sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
+      run: sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo cp lib/*.a /usr/lib && sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a && sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
+      
+    - name: Install gmock
+      run: sudo apt-get install libgmock-dev && cd /usr/src/googletest && sudo cmake . && sudo cmake --build . && sudo make install
     
     - uses: actions/checkout@v3
     
