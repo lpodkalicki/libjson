@@ -1,7 +1,7 @@
 # libjson
 
 ## About 
-This is a modern C++(17 or newer), free, tiny, simple and one-header JSON library. You are welcome to use it freely in commercial projects.
+This is a modern C++, free, tiny, simple and one-header JSON library. You are welcome to use it freely in commercial projects.
 The tests are designed for Linux but can be adapted for any platform with gtest/gmock support and a modern compiler available.
 
 ## Examples
